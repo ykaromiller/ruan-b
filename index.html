@@ -676,15 +676,23 @@
 
         // ===== CONFIGURE SUAS CREDENCIAIS DO FIREBASE AQUI =====
         // Siga o guia COMO_CONFIGURAR_FIREBASE.md para obter essas informações
-        const firebaseConfig = {
-           apiKey: "AIzaSyALFWARxlx5-sRlHza7GF3mjMyV-zEcxug",
-        authDomain: "barbearia-ruan.firebaseapp.com",
-         databaseURL: "https://barbearia-ruan-default-rtdb.firebaseio.com",
-         projectId: "barbearia-ruan",
-         storageBucket: "barbearia-ruan.firebasestorage.app",
-        messagingSenderId: "831450832448",
-         appId: "1:831450832448:web:1513bb10763f34c79289a5"
-        };
+       // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAc6_ZbdtWsZBMHwXaHtBs7E_TkyEnfYd8",
+  authDomain: "barbearia-ruan.firebaseapp.com",
+  projectId: "barbearia-ruan",
+  storageBucket: "barbearia-ruan.firebasestorage.app",
+  messagingSenderId: "614778991415",
+  appId: "1:614778991415:web:800346410b6ecaf603e0b2",
+  measurementId: "G-HNXKFQXT47"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
         // ========================================================
 
         // Inicializar Firebase
