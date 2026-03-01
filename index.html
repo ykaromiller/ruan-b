@@ -585,19 +585,28 @@
     </footer>
 
     <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-        import { getDatabase, ref, set, get, push, remove, onValue } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+   // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAc6_ZbdtWsZBMHwXaHtBs7E_TkyEnfYd8",
-            authDomain: "barbearia-ruan.firebaseapp.com",
-            databaseURL: "https://barbearia-ruan-default-rtdb.firebaseio.com",
-            projectId: "barbearia-ruan",
-            storageBucket: "barbearia-ruan.firebasestorage.app",
-            messagingSenderId: "614778991415",
-            appId: "1:614778991415:web:800346410b6ecaf603e0b2"
-        };
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAc6_ZbdtWsZBMHwXaHtBs7E_TkyEnfYd8",
+  authDomain: "barbearia-ruan.firebaseapp.com",
+  databaseURL: "https://barbearia-ruan-default-rtdb.firebaseio.com",
+  projectId: "barbearia-ruan",
+  storageBucket: "barbearia-ruan.firebasestorage.app",
+  messagingSenderId: "614778991415",
+  appId: "1:614778991415:web:800346410b6ecaf603e0b2",
+  measurementId: "G-HNXKFQXT47"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
