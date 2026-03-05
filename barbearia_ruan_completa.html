@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbearia Ruan - Agendamento Online</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2a2a2a;
+            --bg-card: #333333;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --accent: #e74c3c;
+            --accent-hover: #c0392b;
+            --border: #444444;
+            --success: #27ae60;
+            --warning: #f39c12;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--bg-card);
+        }
+
+        .btn-danger {
+            background: #c0392b;
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #a93226;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+        }
+
+        .card h2 {
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 0.6rem;
+            margin: 1.5rem 0;
+        }
+
+        .day-card {
+            background: var(--bg-secondary);
+            padding: 1rem 0.5rem;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            min-height: 64px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .day-card:hover {
+            border-color: var(--accent);
+        }
+
+        .day-card.selected {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .day-card.disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.6rem;
+            margin: 1.5rem 0;
+        }
+
+        .time-slot {
+            background: var(--bg-secondary);
+            padding: 1rem 0.5rem;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 1.05rem;
+            min-height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .time-slot:hover {
+            border-color: var(--accent);
+        }
+
+        .time-slot.selected {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .time-slot.booked {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: var(--bg-card);
+        }
+
+        .appointments-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .appointment-item {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .appointment-info {
+            flex: 1;
+        }
+
+        .appointment-info h3 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .appointment-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 0.8rem 1.5rem;
+            background: var(--bg-secondary);
+            border: none;
+            border-radius: 5px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.2rem;
+            background: var(--bg-secondary);
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .footer {
+            background: var(--bg-card);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+            border-top: 2px solid var(--accent);
+        }
+
+        .footer p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0.5rem 0;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: rgba(39, 174, 96, 0.2);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .alert-error {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .payment-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+
+        .payment-badge.paid {
+            background: rgba(39, 174, 96, 0.3);
+            color: var(--success);
+        }
+
+        .payment-badge.pending {
+            background: rgba(243, 156, 18, 0.3);
+            color: var(--warning);
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 0.5rem; }
+            .card { padding: 1.5rem; }
+            .btn { padding: 0.5rem 1rem; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-container">
+            <div class="logo">
+                <div class="logo-icon">R</div>
+                <div class="logo-text">Barbearia Ruan</div>
+            </div>
+            <div class="user-info" id="userInfo"></div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="screen active">
+            <div class="card">
+                <h2>Login / Cadastro</h2>
+                <div id="loginAlert"></div>
+                <div class="form-group">
+                    <label>Nome de Usuario</label>
+                    <input type="text" id="loginUsername" placeholder="Digite seu nome de usuario">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="loginPassword" placeholder="Digite sua senha">
+                </div>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button id="btnLogin" class="btn btn-primary">Entrar</button>
+                    <button id="btnRegister" class="btn btn-secondary">Criar Conta</button>
+                    <button id="btnLoginBarber" class="btn btn-secondary">Acesso do Barbeiro</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barber Screen -->
+        <div id="barberScreen" class="screen">
+            <div class="nav-tabs">
+                <button class="tab active" onclick="showBarberTab('daily')">Visualizacao Diaria</button>
+                <button class="tab" onclick="showBarberTab('settings')">Configuracoes</button>
+            </div>
+
+            <div id="dailyTab" class="tab-content">
+                <div class="card">
+                    <h2>Agendamentos do Dia</h2>
+                    <div id="dailyAlert"></div>
+                    <div class="form-group">
+                        <label>Selecione o Dia</label>
+                        <input type="date" id="barberDaySelect" onchange="loadDailyAppointments()">
+                    </div>
+                    <div class="appointments-list" id="dailyAppointments"></div>
+                </div>
+            </div>
+
+            <div id="settingsTab" class="tab-content" style="display: none;">
+                <div class="card">
+                    <h2>Configuracoes</h2>
+                    <div id="settingsAlert"></div>
+                    
+                    <h3 style="color: var(--accent); margin-top: 1rem; margin-bottom: 1rem;">Configuracoes de Pagamento (PIX)</h3>
+                    <div class="form-group">
+                        <label>Chave PIX Recebedora</label>
+                        <input type="text" id="pixKey" placeholder="Ex: seu-email@email.com ou CPF ou telefone">
+                    </div>
+                    <div class="form-group">
+                        <label>QR Code PIX (Cole a URL ou dados do QR Code)</label>
+                        <textarea id="pixQrCode" placeholder="Cole aqui o codigo do QR Code ou URL" style="min-height: 100px;"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="savePaymentSettings()" style="width: 100%;">Salvar Configuracoes de Pagamento</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Client Screen -->
+        <div id="clientScreen" class="screen">
+            <div class="card">
+                <h2>Bem-vindo ao Agendamento</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Selecione um dia e horario para agendar seu corte.</p>
+                <button class="btn btn-primary" onclick="logout()">Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>Copyright 2026 Barbearia Ruan - Todos os direitos reservados</p>
+        <p>Desenvolvido por <strong>Ykaro</strong></p>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        import { getDatabase, ref, set, get, push, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAc6_ZbdtWsZBMHwXaHtBs7E_TkyEnfYd8",
+            authDomain: "barbearia-ruan.firebaseapp.com",
+            databaseURL: "https://barbearia-ruan-default-rtdb.firebaseio.com",
+            projectId: "barbearia-ruan",
+            storageBucket: "barbearia-ruan.firebasestorage.app",
+            messagingSenderId: "614778991415",
+            appId: "1:614778991415:web:800346410b6ecaf603e0b2",
+            measurementId: "G-HNXKFQXT47"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+
+        window.firebaseDB = {
+            ref: (path) => ref(database, path),
+            set: set,
+            get: get,
+            push: push,
+            remove: remove
+        };
+        window.firebaseInitialized = true;
+        console.log("Firebase Inicializado!");
+    </script>
+
+    <script>
+        const BARBER_CONFIG = { username: 'Ruan', password: 'ruan1' };
+        const SESSION = { currentUser: 'current_user_session' };
+
+        function waitForFirebase(callback) {
+            if (window.firebaseInitialized && window.firebaseDB) {
+                callback();
+            } else {
+                setTimeout(() => waitForFirebase(callback), 100);
+            }
+        }
+
+        function showAlert(containerId, message, type) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+                setTimeout(() => { container.innerHTML = ''; }, 5000);
+            }
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function updateUserInfo() {
+            const user = JSON.parse(sessionStorage.getItem(SESSION.currentUser) || 'null');
+            const div = document.getElementById('userInfo');
+            div.innerHTML = user ? `<span>Ola, ${user.username}</span><button class="btn btn-secondary" onclick="logout()">Sair</button>` : '';
+        }
+
+        function logout() {
+            sessionStorage.removeItem(SESSION.currentUser);
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            showScreen('loginScreen');
+            updateUserInfo();
+        }
+
+        async function loginAsBarber() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            if (username === BARBER_CONFIG.username && password === BARBER_CONFIG.password) {
+                const barber = { username: BARBER_CONFIG.username, isBarber: true };
+                sessionStorage.setItem(SESSION.currentUser, JSON.stringify(barber));
+                showBarberScreen();
+            } else {
+                showAlert('loginAlert', 'Credenciais invalidas', 'error');
+            }
+        }
+
+        function showBarberScreen() {
+            showScreen('barberScreen');
+            updateUserInfo();
+            loadSettings();
+            setTodayDate();
+            loadDailyAppointments();
+        }
+
+        function showBarberTab(tab) {
+            document.querySelectorAll('#barberScreen .tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('dailyTab').style.display = tab === 'daily' ? 'block' : 'none';
+            document.getElementById('settingsTab').style.display = tab === 'settings' ? 'block' : 'none';
+            if (tab === 'settings') loadSettings();
+        }
+
+        function setTodayDate() {
+            const today = new Date().toISOString().split('T')[0];
+            const input = document.getElementById('barberDaySelect');
+            if (input) input.value = today;
+        }
+
+        async function getAppointments() {
+            try {
+                const snapshot = await window.firebaseDB.get(window.firebaseDB.ref('appointments'));
+                return snapshot.exists() ? Object.entries(snapshot.val()).map(([id, data]) => ({ id, ...data })) : [];
+            } catch (e) {
+                console.error("Erro ao buscar agendamentos:", e);
+                return [];
+            }
+        }
+
+        async function loadDailyAppointments() {
+            const dateInput = document.getElementById('barberDaySelect').value;
+            if (!dateInput) return;
+            const selectedDate = new Date(dateInput + 'T00:00:00');
+            const nextDay = new Date(selectedDate);
+            nextDay.setDate(nextDay.getDate() + 1);
+            const appointments = await getAppointments();
+            const dayAppointments = appointments
+                .map(a => ({ ...a, date: new Date(a.date) }))
+                .filter(a => a.date >= selectedDate && a.date < nextDay)
+                .sort((a, b) => a.date - b.date);
+            displayBarberAppointments('dailyAppointments', dayAppointments);
+        }
+
+        function displayBarberAppointments(id, appointments) {
+            const container = document.getElementById(id);
+            if (!container) return;
+            if (appointments.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Nenhum agendamento</p>';
+                return;
+            }
+            container.innerHTML = appointments.map(a => `
+                <div class="appointment-item">
+                    <div class="appointment-info">
+                        <h3>${a.username}</h3>
+                        <p>${a.date.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                        <p>Horario: ${a.date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
+                        <p>Servico: ${a.serviceName || 'Nao especificado'}</p>
+                        <p>Valor: R$ ${(a.servicePrice || 0).toFixed(2)}</p>
+                        <span class="payment-badge ${a.paymentStatus === 'paid' ? 'paid' : 'pending'}">
+                            ${a.paymentStatus === 'paid' ? 'Pago' : 'Pendente'}
+                        </span>
+                    </div>
+                    <button class="btn btn-danger" onclick="cancelAppointment('${a.id}')">Cancelar</button>
+                </div>
+            `).join('');
+        }
+
+        async function cancelAppointment(appointmentId) {
+            if (!confirm('Tem certeza que deseja cancelar este agendamento?')) return;
+            try {
+                await window.firebaseDB.remove(window.firebaseDB.ref(`appointments/${appointmentId}`));
+                showAlert('dailyAlert', 'Agendamento cancelado com sucesso!', 'success');
+                loadDailyAppointments();
+            } catch (e) {
+                console.error(e);
+                showAlert('dailyAlert', 'Erro ao cancelar agendamento', 'error');
+            }
+        }
+
+        async function loadSettings() {
+            try {
+                const snapshot = await window.firebaseDB.get(window.firebaseDB.ref('paymentSettings'));
+                if (snapshot.exists()) {
+                    const settings = snapshot.val();
+                    document.getElementById('pixKey').value = settings.pixKey || '';
+                    document.getElementById('pixQrCode').value = settings.pixQrCode || '';
+                }
+            } catch (e) {
+                console.error('Erro ao carregar configuracoes:', e);
+            }
+        }
+
+        async function savePaymentSettings() {
+            const pixKey = document.getElementById('pixKey').value.trim();
+            const pixQrCode = document.getElementById('pixQrCode').value.trim();
+            
+            if (!pixKey) return showAlert('settingsAlert', 'Informe sua Chave PIX', 'error');
+            if (!pixQrCode) return showAlert('settingsAlert', 'Informe o QR Code PIX', 'error');
+            
+            try {
+                const paymentSettings = {
+                    pixKey: pixKey,
+                    pixQrCode: pixQrCode,
+                    updatedAt: new Date().toISOString()
+                };
+                await window.firebaseDB.set(window.firebaseDB.ref('paymentSettings'), paymentSettings);
+                showAlert('settingsAlert', 'Configuracoes de pagamento salvas com sucesso!', 'success');
+            } catch (e) {
+                console.error(e);
+                showAlert('settingsAlert', 'Erro ao salvar configuracoes', 'error');
+            }
+        }
+
+        window.onload = function() {
+            waitForFirebase(() => {
+                document.getElementById('btnLogin').addEventListener('click', () => {
+                    showAlert('loginAlert', 'Funcionalidade em desenvolvimento', 'error');
+                });
+                document.getElementById('btnRegister').addEventListener('click', () => {
+                    showAlert('loginAlert', 'Funcionalidade em desenvolvimento', 'error');
+                });
+                document.getElementById('btnLoginBarber').addEventListener('click', loginAsBarber);
+                updateUserInfo();
+            });
+        };
+
+        window.showBarberTab = showBarberTab;
+        window.logout = logout;
+        window.loadDailyAppointments = loadDailyAppointments;
+        window.cancelAppointment = cancelAppointment;
+        window.savePaymentSettings = savePaymentSettings;
+    </script>
+</body>
+</html>
